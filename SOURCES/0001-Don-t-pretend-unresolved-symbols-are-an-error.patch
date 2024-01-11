@@ -1,0 +1,31 @@
+From c8cfca25ab2ed65013448f7502bae933c66390ae Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Fri, 5 Jun 2020 14:23:09 +1000
+Subject: [PATCH xkbcomp] Don't pretend unresolved symbols are an error
+
+Whenever xkeyboard-config is newer than xorgproto, or libX11 just hasn't yet
+been rebuilt against the protocol we end up with some unresolved symbols.
+That's not an error, it just happens. Let's downgrade this to a warning
+instead.
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+ symbols.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/symbols.c b/symbols.c
+index 3fe0195..ece1caa 100644
+--- a/symbols.c
++++ b/symbols.c
+@@ -968,7 +968,7 @@ AddSymbolsToKey(KeyInfo * key,
+     key->symsDefined |= (1 << ndx);
+     for (i = 0; i < nSyms; i++) {
+         if (!LookupKeysym(value->value.list.syms[i], &key->syms[ndx][i])) {
+-            WSGO1("Could not resolve keysym %s\n", value->value.list.syms[i]);
++            WARN2("Could not resolve keysym %s\n", value->value.list.syms[i]);
+             key->syms[ndx][i] = NoSymbol;
+         }
+     }
+-- 
+2.26.2
+
